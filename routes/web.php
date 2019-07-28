@@ -12,11 +12,14 @@
 */
 
 Route::get('/', function () {
-    return view('home.home');
+    return redirect('login');
 });
 
 Route::resource('data','DataController');
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
 
 
 
+Auth::routes();
 
+// Route::get('/home', 'HomeController@index')->name('home');

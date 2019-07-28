@@ -4,18 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 Use App\Data;
+use Image;
+
+use Auth;
 class DataController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {               
+        $this->middleware('auth');
+    }
     public function index()
     {
 
         $data=Data::orderBy('id','desc')->get();
-         return view('data.list',compact('data')); 
+        return view('data.list',compact('data')); 
     }
 
 
@@ -47,13 +49,13 @@ class DataController extends Controller
    $data->date = $request->date;
    $data->telepon = $request->tlp;
    $data->gender = $request->gender;
-   $data->foto = $request->foto;
+     $file   = $request->file('foto');
+    $gambar = $file->getClientOriginalName();
+    $request->file('foto')->move("image/", $gambar);
+    $data->foto = $gambar;
 
-   $data->save();
-
-    // dd($data);
-    $data=Data::orderBy('id','desc')->get();
- return view('data.list',compact('data'));
+     $data->save();
+      return redirect()->route('data.index');
 
 
 
@@ -69,7 +71,7 @@ class DataController extends Controller
     {
 
 
-        //
+        
     }
 
     /**
@@ -81,8 +83,8 @@ class DataController extends Controller
     public function edit($id)
     
     {
-
-        return view('data.edit');
+        $data = Data::findOrFail($id);
+        return view('data.edit', compact('data'));
         //
     }
 
@@ -95,7 +97,15 @@ class DataController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = Data::findOrFail($id);
+        $data->nama = $request->nama; 
+        $data->email = $request->email;
+           $data->date = $request->date;
+           $data->telepon = $request->tlp;
+           $data->gender = $request->gender;
+           $data->foto = $request->foto;
+            $data->save();
+            return redirect()->route('data.index');
     }
 
     /**
@@ -106,6 +116,8 @@ class DataController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $pages = Data::findOrFail($id);
+        $pages->delete();
+        return redirect()->route('data.index');
     }
 }
